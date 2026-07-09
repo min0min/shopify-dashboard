@@ -1,0 +1,83 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { prisma } from "@/app/lib/prisma";
+import {
+  collectAvailableMonths,
+  lastNMonths,
+  monthlyRevenueSeries,
+  shopFixedCostTotal,
+  shopRevenueForMonth,
+} from "@/app/lib/calc";
+import SummaryCards from "@/app/components/SummaryCards";
+import FixedCostManager from "@/app/components/FixedCostManager";
+import RevenueManager from "@/app/components/RevenueManager";
+import RevenueChart from "@/app/components/RevenueChart";
+import InlineEditableName from "@/app/components/InlineEditableName";
+
+export default async function ShopPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ month?: string }>;
+}) {
+  const { id } = await params;
+  const { month: monthParam } = await searchParams;
+
+  const shop = await prisma.shop.findUnique({
+    where: { id },
+    include: {
+      googleAccount: true,
+      fixedCostItems: { orderBy: { createdAt: "asc" } },
+      revenueEntries: { orderBy: { date: "desc" } },
+    },
+  });
+
+  if (!shop) notFound();
+
+  const months = collectAvailableMonths([shop]);
+  const month = monthParam && months.includes(monthParam) ? monthParam : months[0];
+  const revenue = shopRevenueForMonth(shop, month);
+  const fixedCost = shopFixedCostTotal(shop);
+  const chartSeries = monthlyRevenueSeries([shop], lastNMonths(6, month));
+
+  return (
+    <main className="mx-auto w-full max-w-4xl flex-1 px-6 py-10">
+      <div className="text-sm text-neutral-500">
+        <Link href="/" className="hover:text-neutral-800">
+          전체 계정
+        </Link>{" "}
+        /{" "}
+        <Link
+          href={`/accounts/${shop.googleAccountId}`}
+          className="hover:text-neutral-800"
+        >
+          {shop.googleAccount.name}
+        </Link>
+      </div>
+
+      <div className="mt-3">
+        <p className="text-xs uppercase tracking-wide text-neutral-400">샵</p>
+        <InlineEditableName
+          url={`/api/shops/${shop.id}`}
+          name={shop.name}
+          as="h1"
+          className="text-2xl font-bold"
+        />
+      </div>
+
+      <div className="mt-6">
+        <SummaryCards revenue={revenue} fixedCost={fixedCost} month={month} />
+      </div>
+
+      <div className="mt-6">
+        <RevenueChart title={`${shop.name} 매출 추이`} data={chartSeries} />
+      </div>
+
+      <div className="mt-8 grid grid-cols-1 gap-6">
+        <FixedCostManager shopId={shop.id} items={shop.fixedCostItems} />
+        <RevenueManager shopId={shop.id} entries={shop.revenueEntries} />
+      </div>
+    </main>
+  );
+}
