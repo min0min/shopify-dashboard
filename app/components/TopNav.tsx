@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import HeaderCalendar from "@/app/components/HeaderCalendar";
 
 type Shop = { id: string; name: string };
@@ -106,7 +106,9 @@ export default function TopNav({
           )}
         </div>
 
-        <HeaderCalendar revenueByDate={revenueByDate} />
+        <Suspense fallback={null}>
+          <HeaderCalendar revenueByDate={revenueByDate} />
+        </Suspense>
 
         <div className="ml-auto">
           {adding ? (
