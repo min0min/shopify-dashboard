@@ -69,28 +69,30 @@ export default function HeaderCalendar({
           setViewMonth(month);
           setOpen((v) => !v);
         }}
-        className="flex items-center gap-1.5 rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-sm hover:bg-neutral-50"
+        className="flex items-center gap-1.5 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-1.5 text-sm text-neutral-900 dark:text-neutral-100 hover:bg-neutral-50 dark:hover:bg-neutral-700"
       >
         <span aria-hidden>📅</span>
         {buttonLabel}
       </button>
 
       {open && (
-        <div className="absolute left-0 z-20 mt-2 w-72 rounded-xl border border-neutral-200 bg-white p-3 shadow-lg">
+        <div className="absolute left-0 z-20 mt-2 w-72 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 p-3 shadow-lg">
           <div className="flex items-center justify-between">
             <button
               type="button"
               onClick={() => setViewYear((y) => Math.max(MIN_YEAR, y - 1))}
               disabled={viewYear <= MIN_YEAR}
-              className="rounded px-2 py-1 text-sm text-neutral-500 hover:bg-neutral-100 disabled:opacity-30"
+              className="rounded px-2 py-1 text-sm text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-700 disabled:opacity-30"
             >
               ◀
             </button>
-            <span className="text-sm font-semibold">{viewYear}년</span>
+            <span className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+              {viewYear}년
+            </span>
             <button
               type="button"
               onClick={() => setViewYear((y) => y + 1)}
-              className="rounded px-2 py-1 text-sm text-neutral-500 hover:bg-neutral-100"
+              className="rounded px-2 py-1 text-sm text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-700"
             >
               ▶
             </button>
@@ -112,17 +114,17 @@ export default function HeaderCalendar({
                   }}
                   className={`relative rounded-lg px-1.5 py-1.5 text-xs ${
                     isSelected
-                      ? "bg-neutral-900 text-white"
+                      ? "bg-neutral-900 dark:bg-white text-white dark:text-neutral-900"
                       : isViewing
-                      ? "bg-neutral-100 text-neutral-900"
-                      : "text-neutral-600 hover:bg-neutral-50"
+                      ? "bg-neutral-100 dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100"
+                      : "text-neutral-600 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700"
                   }`}
                 >
                   {label}
                   {hasRevenue && (
                     <span
                       className={`absolute right-1 top-1 h-1 w-1 rounded-full ${
-                        isSelected ? "bg-white" : "bg-emerald-500"
+                        isSelected ? "bg-white dark:bg-neutral-900" : "bg-emerald-500"
                       }`}
                     />
                   )}
@@ -131,8 +133,8 @@ export default function HeaderCalendar({
             })}
           </div>
 
-          <div className="mt-3 border-t border-neutral-100 pt-2">
-            <div className="grid grid-cols-7 gap-y-1 text-center text-[11px] text-neutral-400">
+          <div className="mt-3 border-t border-neutral-100 dark:border-neutral-700 pt-2">
+            <div className="grid grid-cols-7 gap-y-1 text-center text-[11px] text-neutral-400 dark:text-neutral-500">
               {WEEKDAYS.map((w) => (
                 <span key={w}>{w}</span>
               ))}
@@ -152,15 +154,15 @@ export default function HeaderCalendar({
                     onClick={() => setSelectedDate(dateStr)}
                     className={`relative mx-auto flex h-6 w-6 items-center justify-center rounded-full ${
                       isSelected
-                        ? "bg-neutral-900 text-white"
-                        : "text-neutral-700 hover:bg-neutral-100"
+                        ? "bg-neutral-900 dark:bg-white text-white dark:text-neutral-900"
+                        : "text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-700"
                     }`}
                   >
                     {day}
                     {hasRevenue && (
                       <span
                         className={`absolute bottom-0.5 h-1 w-1 rounded-full ${
-                          isSelected ? "bg-white" : "bg-emerald-500"
+                          isSelected ? "bg-white dark:bg-neutral-900" : "bg-emerald-500"
                         }`}
                       />
                     )}
@@ -171,9 +173,9 @@ export default function HeaderCalendar({
           </div>
 
           {selectedDate && (
-            <p className="mt-2 border-t border-neutral-100 pt-2 text-center text-xs text-neutral-600">
+            <p className="mt-2 border-t border-neutral-100 dark:border-neutral-700 pt-2 text-center text-xs text-neutral-600 dark:text-neutral-400">
               {selectedDate} 총 매출{" "}
-              <span className="font-semibold text-neutral-900">
+              <span className="font-semibold text-neutral-900 dark:text-neutral-100">
                 {formatCurrency(revenueByDate[selectedDate] ?? 0)}
               </span>
             </p>

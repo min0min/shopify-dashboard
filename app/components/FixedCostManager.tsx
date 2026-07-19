@@ -44,28 +44,32 @@ export default function FixedCostManager({
   }
 
   return (
-    <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
+    <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-5 shadow-sm">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">고정비 항목</h2>
-        <p className="text-sm text-neutral-500">
+        <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
+          고정비 항목
+        </h2>
+        <p className="text-sm text-neutral-500 dark:text-neutral-400">
           월 합계{" "}
-          <span className="font-semibold text-rose-600">
+          <span className="font-semibold text-rose-600 dark:text-rose-400">
             {formatCurrency(total)}
           </span>
         </p>
       </div>
 
       {items.length === 0 ? (
-        <p className="mt-4 text-sm text-neutral-500">
+        <p className="mt-4 text-sm text-neutral-500 dark:text-neutral-400">
           등록된 고정비 항목이 없습니다.
         </p>
       ) : (
-        <ul className="mt-4 divide-y divide-neutral-100">
+        <ul className="mt-4 divide-y divide-neutral-100 dark:divide-neutral-800">
           {items.map((item) => (
             <li key={item.id} className="flex items-center justify-between py-2">
-              <span className="text-sm">{item.name}</span>
+              <span className="text-sm text-neutral-800 dark:text-neutral-200">
+                {item.name}
+              </span>
               <div className="flex items-center gap-3">
-                <span className="text-sm font-medium text-rose-600">
+                <span className="text-sm font-medium text-rose-600 dark:text-rose-400">
                   {formatCurrency(item.amount)}
                 </span>
                 <DeleteButton
@@ -83,19 +87,19 @@ export default function FixedCostManager({
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="항목명 (예: Shopify 구독료)"
-          className="flex-1 rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm"
+          className="flex-1 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500"
         />
         <input
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           placeholder="금액 (예: 39)"
           inputMode="decimal"
-          className="w-28 rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm"
+          className="w-28 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500"
         />
         <button
           type="submit"
           disabled={pending}
-          className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+          className="rounded-lg bg-neutral-900 dark:bg-white px-4 py-2 text-sm font-medium text-white dark:text-neutral-900 disabled:opacity-50"
         >
           {pending ? "추가중..." : "추가"}
         </button>

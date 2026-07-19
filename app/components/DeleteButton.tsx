@@ -42,7 +42,7 @@ export default function DeleteButton({
     <button
       onClick={handleClick}
       disabled={pending}
-      className={`text-xs text-neutral-400 hover:text-rose-600 disabled:opacity-50 ${className}`}
+      className={`text-xs text-neutral-400 dark:text-neutral-500 hover:text-rose-600 dark:hover:text-rose-400 disabled:opacity-50 ${className}`}
     >
       {pending ? "삭제중..." : label}
     </button>

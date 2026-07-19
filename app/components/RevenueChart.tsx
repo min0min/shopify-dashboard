@@ -82,11 +82,11 @@ export default function RevenueChart({
   }
 
   return (
-    <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-sm">
-      <h2 className="text-lg font-semibold">{title}</h2>
+    <div className="rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-5 shadow-sm">
+      <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">{title}</h2>
 
       {data.length === 0 || data.every((d) => d.revenue === 0) ? (
-        <p className="mt-8 text-center text-sm text-neutral-500">
+        <p className="mt-8 text-center text-sm text-neutral-500 dark:text-neutral-400">
           표시할 매출 데이터가 없습니다.
         </p>
       ) : (
@@ -105,18 +105,31 @@ export default function RevenueChart({
                   x2={WIDTH - PAD_RIGHT}
                   y1={y}
                   y2={y}
-                  stroke="#e1e0d9"
+                  style={{ stroke: "var(--chart-grid)" }}
                   strokeWidth={1}
                 />
-                <text x={PAD_LEFT - 8} y={y + 4} textAnchor="end" fontSize={11} fill="#898781">
+                <text
+                  x={PAD_LEFT - 8}
+                  y={y + 4}
+                  textAnchor="end"
+                  fontSize={11}
+                  style={{ fill: "var(--chart-muted)" }}
+                >
                   {tick >= 1000 ? `${Math.round(tick / 100) / 10}K` : tick}
                 </text>
               </g>
             );
           })}
 
-          <path d={areaPath} fill="#2a78d6" fillOpacity={0.1} stroke="none" />
-          <path d={linePath} fill="none" stroke="#2a78d6" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
+          <path d={areaPath} style={{ fill: "var(--chart-line)" }} fillOpacity={0.1} stroke="none" />
+          <path
+            d={linePath}
+            fill="none"
+            style={{ stroke: "var(--chart-line)" }}
+            strokeWidth={2}
+            strokeLinejoin="round"
+            strokeLinecap="round"
+          />
 
           {points.map((p, i) => (
             <text
@@ -125,7 +138,7 @@ export default function RevenueChart({
               y={HEIGHT - 8}
               textAnchor="middle"
               fontSize={11}
-              fill="#898781"
+              style={{ fill: "var(--chart-muted)" }}
             >
               {i === 0 || i === points.length - 1 || points.length <= 8 ? monthLabel(p.month) : ""}
             </text>
@@ -136,8 +149,7 @@ export default function RevenueChart({
               cx={points[points.length - 1].x}
               cy={points[points.length - 1].y}
               r={4}
-              fill="#2a78d6"
-              stroke="#fcfcfb"
+              style={{ fill: "var(--chart-line)", stroke: "var(--chart-surface)" }}
               strokeWidth={2}
             />
           )}
@@ -149,15 +161,14 @@ export default function RevenueChart({
                 x2={points[hoverIndex].x}
                 y1={PAD_TOP}
                 y2={PAD_TOP + plotHeight}
-                stroke="#c3c2b7"
+                style={{ stroke: "var(--chart-crosshair)" }}
                 strokeWidth={1}
               />
               <circle
                 cx={points[hoverIndex].x}
                 cy={points[hoverIndex].y}
                 r={4}
-                fill="#2a78d6"
-                stroke="#fcfcfb"
+                style={{ fill: "var(--chart-line)", stroke: "var(--chart-surface)" }}
                 strokeWidth={2}
               />
             </g>
@@ -166,9 +177,9 @@ export default function RevenueChart({
       )}
 
       {hoverIndex !== null && points[hoverIndex] && (
-        <p className="mt-1 text-center text-sm text-neutral-600">
+        <p className="mt-1 text-center text-sm text-neutral-600 dark:text-neutral-400">
           {points[hoverIndex].month} ·{" "}
-          <span className="font-medium text-neutral-900">
+          <span className="font-medium text-neutral-900 dark:text-neutral-100">
             {formatCurrency(points[hoverIndex].revenue)}
           </span>
         </p>

@@ -8,6 +8,33 @@ import HeaderCalendar from "@/app/components/HeaderCalendar";
 type Shop = { id: string; name: string };
 type Account = { id: string; name: string; shops: Shop[] };
 
+function ShopBagLogo() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="24"
+      height="24"
+      fill="none"
+      aria-hidden
+      className="shrink-0"
+    >
+      <path
+        d="M6.5 8a5.5 5.5 0 0 1 11 0"
+        stroke="#5E8E3E"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+      <rect x="4" y="7.5" width="16" height="13" rx="3.2" fill="#95BF47" />
+      <path
+        d="M8.7 11v1.2a3.3 3.3 0 0 0 6.6 0V11"
+        stroke="white"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 export default function TopNav({
   accounts,
   revenueByDate,
@@ -69,10 +96,14 @@ export default function TopNav({
     }
   }
 
+  const selectClass =
+    "rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-1.5 text-sm text-neutral-900 dark:text-neutral-100";
+
   return (
-    <header className="sticky top-0 z-10 border-b border-neutral-200 bg-white/90 backdrop-blur">
+    <header className="sticky top-0 z-10 border-b border-neutral-200 dark:border-neutral-800 bg-white/90 dark:bg-neutral-950/90 backdrop-blur">
       <div className="mx-auto flex w-full max-w-5xl flex-wrap items-center gap-3 px-6 py-3">
-        <Link href="/" className="text-sm font-semibold text-neutral-900">
+        <Link href="/" className="flex items-center gap-2 text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+          <ShopBagLogo />
           Shopify 대시보드
         </Link>
 
@@ -80,7 +111,7 @@ export default function TopNav({
           <select
             value={currentAccountId}
             onChange={(e) => handleAccountChange(e.target.value)}
-            className="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-sm"
+            className={selectClass}
           >
             <option value="">구글 계정 선택</option>
             {accounts.map((account) => (
@@ -94,7 +125,7 @@ export default function TopNav({
             <select
               value={currentShopId}
               onChange={(e) => handleShopChange(e.target.value)}
-              className="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-sm"
+              className={selectClass}
             >
               <option value="">샵 선택</option>
               {currentAccount.shops.map((shop) => (
@@ -118,12 +149,12 @@ export default function TopNav({
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
                 placeholder="새 구글 계정 이름"
-                className="w-40 rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-sm"
+                className="w-40 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-1.5 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500"
               />
               <button
                 type="submit"
                 disabled={pending}
-                className="rounded-lg bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white disabled:opacity-50"
+                className="rounded-lg bg-neutral-900 dark:bg-white px-3 py-1.5 text-sm font-medium text-white dark:text-neutral-900 disabled:opacity-50"
               >
                 {pending ? "추가중..." : "저장"}
               </button>
@@ -133,7 +164,7 @@ export default function TopNav({
                   setAdding(false);
                   setNewName("");
                 }}
-                className="text-sm text-neutral-400 hover:text-neutral-700"
+                className="text-sm text-neutral-400 dark:text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
               >
                 취소
               </button>
@@ -141,7 +172,7 @@ export default function TopNav({
           ) : (
             <button
               onClick={() => setAdding(true)}
-              className="rounded-lg border border-neutral-300 px-3 py-1.5 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+              className="rounded-lg border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-900"
             >
               + 추가
             </button>

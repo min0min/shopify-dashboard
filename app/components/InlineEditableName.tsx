@@ -64,13 +64,13 @@ export default function InlineEditableName({
               setValue(name);
             }
           }}
-          className="rounded-lg border border-neutral-300 bg-white px-2 py-1 text-sm"
+          className="rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-2 py-1 text-sm text-neutral-900 dark:text-neutral-100"
         />
         <button
           type="submit"
           disabled={pending}
           onClick={(e) => e.stopPropagation()}
-          className="text-xs font-medium text-emerald-600 hover:text-emerald-700 disabled:opacity-50"
+          className="text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 disabled:opacity-50"
         >
           저장
         </button>
@@ -82,7 +82,7 @@ export default function InlineEditableName({
             setEditing(false);
             setValue(name);
           }}
-          className="text-xs text-neutral-400 hover:text-neutral-700"
+          className="text-xs text-neutral-400 dark:text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
         >
           취소
         </button>
@@ -100,7 +100,7 @@ export default function InlineEditableName({
           e.stopPropagation();
           setEditing(true);
         }}
-        className="text-xs text-neutral-400 hover:text-neutral-700"
+        className="text-xs text-neutral-400 dark:text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300"
         aria-label="이름 수정"
         title="이름 수정"
       >

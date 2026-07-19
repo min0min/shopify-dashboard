@@ -1,5 +1,5 @@
 export type FixedCostItemLike = { amount: number };
-export type RevenueEntryLike = { date: string; amount: number };
+export type RevenueEntryLike = { date: string; amount: number; orderCost: number };
 export type ShopLike = {
   fixedCostItems: FixedCostItemLike[];
   revenueEntries: RevenueEntryLike[];
@@ -31,6 +31,12 @@ export function shopRevenueForMonth(shop: ShopLike, month: string): number {
     .reduce((sum, entry) => sum + entry.amount, 0);
 }
 
+export function shopOrderCostForMonth(shop: ShopLike, month: string): number {
+  return shop.revenueEntries
+    .filter((entry) => entry.date.startsWith(month))
+    .reduce((sum, entry) => sum + entry.orderCost, 0);
+}
+
 export function shopRevenueForDate(shop: ShopLike, date: string): number {
   return shop.revenueEntries
     .filter((entry) => entry.date === date)
@@ -38,7 +44,11 @@ export function shopRevenueForDate(shop: ShopLike, date: string): number {
 }
 
 export function shopNetProfitForMonth(shop: ShopLike, month: string): number {
-  return shopRevenueForMonth(shop, month) - shopFixedCostTotal(shop);
+  return (
+    shopRevenueForMonth(shop, month) -
+    shopFixedCostTotal(shop) -
+    shopOrderCostForMonth(shop, month)
+  );
 }
 
 export function lastNMonths(n: number, endMonth?: string): string[] {
@@ -65,9 +75,10 @@ export function sumTotals(shops: ShopLike[], month: string) {
     (acc, shop) => {
       acc.revenue += shopRevenueForMonth(shop, month);
       acc.fixedCost += shopFixedCostTotal(shop);
+      acc.orderCost += shopOrderCostForMonth(shop, month);
       return acc;
     },
-    { revenue: 0, fixedCost: 0 }
+    { revenue: 0, fixedCost: 0, orderCost: 0 }
   );
 }
 
@@ -94,10 +105,24 @@ export function monthlyRevenueSeries(
   }));
 }
 
+/** Truncates (never rounds) to 2 decimal places, e.g. 65.45555 -> 65.45 */
+export function truncateToCents(amount: number): number {
+  const sign = amount < 0 ? -1 : 1;
+  return (sign * Math.floor(Math.abs(amount) * 100)) / 100;
+}
+
 export function formatCurrency(amount: number): string {
-  return amount.toLocaleString("en-US", {
+  const truncated = truncateToCents(amount);
+  return truncated.toLocaleString("en-US", {
     style: "currency",
     currency: "USD",
-    maximumFractionDigits: 0,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   });
+}
+
+/** Converts a USD amount to KRW using the given rate, truncated to a whole won. */
+export function formatKRW(amountUsd: number, rate: number): string {
+  const won = Math.floor(truncateToCents(amountUsd) * rate);
+  return `₩${won.toLocaleString("ko-KR")}`;
 }

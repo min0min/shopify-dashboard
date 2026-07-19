@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/app/lib/prisma";
+import { getUsdToKrwRate } from "@/app/lib/exchangeRate";
 import {
   collectAvailableMonths,
   lastNMonths,
   monthlyRevenueSeries,
   shopFixedCostTotal,
+  shopOrderCostForMonth,
   shopRevenueForMonth,
 } from "@/app/lib/calc";
 import SummaryCards from "@/app/components/SummaryCards";
@@ -24,14 +26,17 @@ export default async function ShopPage({
   const { id } = await params;
   const { month: monthParam } = await searchParams;
 
-  const shop = await prisma.shop.findUnique({
-    where: { id },
-    include: {
-      googleAccount: true,
-      fixedCostItems: { orderBy: { createdAt: "asc" } },
-      revenueEntries: { orderBy: { date: "desc" } },
-    },
-  });
+  const [shop, krwRate] = await Promise.all([
+    prisma.shop.findUnique({
+      where: { id },
+      include: {
+        googleAccount: true,
+        fixedCostItems: { orderBy: { createdAt: "asc" } },
+        revenueEntries: { orderBy: { date: "desc" } },
+      },
+    }),
+    getUsdToKrwRate(),
+  ]);
 
   if (!shop) notFound();
 
@@ -39,35 +44,42 @@ export default async function ShopPage({
   const month = monthParam && months.includes(monthParam) ? monthParam : months[0];
   const revenue = shopRevenueForMonth(shop, month);
   const fixedCost = shopFixedCostTotal(shop);
+  const orderCost = shopOrderCostForMonth(shop, month);
   const chartSeries = monthlyRevenueSeries([shop], lastNMonths(6, month));
 
   return (
     <main className="mx-auto w-full max-w-4xl flex-1 px-6 py-10">
-      <div className="text-sm text-neutral-500">
-        <Link href="/" className="hover:text-neutral-800">
+      <div className="text-sm text-neutral-500 dark:text-neutral-400">
+        <Link href="/" className="hover:text-neutral-800 dark:hover:text-neutral-200">
           전체 계정
         </Link>{" "}
         /{" "}
         <Link
           href={`/accounts/${shop.googleAccountId}`}
-          className="hover:text-neutral-800"
+          className="hover:text-neutral-800 dark:hover:text-neutral-200"
         >
           {shop.googleAccount.name}
         </Link>
       </div>
 
       <div className="mt-3">
-        <p className="text-xs uppercase tracking-wide text-neutral-400">샵</p>
+        <p className="text-xs uppercase tracking-wide text-neutral-400 dark:text-neutral-500">샵</p>
         <InlineEditableName
           url={`/api/shops/${shop.id}`}
           name={shop.name}
           as="h1"
-          className="text-2xl font-bold"
+          className="text-2xl font-bold text-neutral-900 dark:text-neutral-100"
         />
       </div>
 
       <div className="mt-6">
-        <SummaryCards revenue={revenue} fixedCost={fixedCost} month={month} />
+        <SummaryCards
+          revenue={revenue}
+          fixedCost={fixedCost}
+          orderCost={orderCost}
+          month={month}
+          krwRate={krwRate}
+        />
       </div>
 
       <div className="mt-6">

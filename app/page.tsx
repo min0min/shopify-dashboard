@@ -1,4 +1,5 @@
 import { prisma } from "@/app/lib/prisma";
+import { getUsdToKrwRate } from "@/app/lib/exchangeRate";
 import { collectAvailableMonths, lastNMonths, monthlyRevenueSeries, sumTotals } from "@/app/lib/calc";
 import SummaryCards from "@/app/components/SummaryCards";
 import AccountCard from "@/app/components/AccountCard";
@@ -12,15 +13,18 @@ export default async function HomePage({
 }) {
   const { month: monthParam } = await searchParams;
 
-  const accounts = await prisma.googleAccount.findMany({
-    orderBy: { order: "asc" },
-    include: {
-      shops: {
-        orderBy: { order: "asc" },
-        include: { fixedCostItems: true, revenueEntries: true },
+  const [accounts, krwRate] = await Promise.all([
+    prisma.googleAccount.findMany({
+      orderBy: { order: "asc" },
+      include: {
+        shops: {
+          orderBy: { order: "asc" },
+          include: { fixedCostItems: true, revenueEntries: true },
+        },
       },
-    },
-  });
+    }),
+    getUsdToKrwRate(),
+  ]);
 
   const allShops = accounts.flatMap((a) => a.shops);
   const months = collectAvailableMonths(allShops);
@@ -31,8 +35,10 @@ export default async function HomePage({
   return (
     <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-10">
       <div>
-        <h1 className="text-2xl font-bold">샵 매출 · 고정비 대시보드</h1>
-        <p className="mt-1 text-sm text-neutral-500">
+        <h1 className="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+          샵 매출 · 고정비 대시보드
+        </h1>
+        <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
           구글 계정별로 묶인 쇼피파이 샵의 매출, 고정비, 순이익을 확인하세요.
         </p>
       </div>
@@ -41,7 +47,9 @@ export default async function HomePage({
         <SummaryCards
           revenue={totals.revenue}
           fixedCost={totals.fixedCost}
+          orderCost={totals.orderCost}
           month={month}
+          krwRate={krwRate}
         />
       </div>
 
@@ -51,13 +59,15 @@ export default async function HomePage({
 
       <div className="mt-10">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">구글 계정</h2>
+          <h2 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
+            구글 계정
+          </h2>
         </div>
         <div className="mb-4">
           <AddAccountForm />
         </div>
         {accounts.length === 0 ? (
-          <p className="rounded-xl border border-dashed border-neutral-300 p-8 text-center text-sm text-neutral-500">
+          <p className="rounded-xl border border-dashed border-neutral-300 dark:border-neutral-700 p-8 text-center text-sm text-neutral-500 dark:text-neutral-400">
             아직 등록된 구글 계정이 없습니다. 위에서 추가해보세요.
           </p>
         ) : (
@@ -72,6 +82,7 @@ export default async function HomePage({
                   shopCount={account.shops.length}
                   revenue={accTotals.revenue}
                   fixedCost={accTotals.fixedCost}
+                  orderCost={accTotals.orderCost}
                 />
               );
             })}

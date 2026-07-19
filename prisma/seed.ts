@@ -60,11 +60,14 @@ async function main() {
         for (const day of pickedDays) {
           const base = 200 + s * 40;
           const jitter = Math.floor(Math.random() * 150);
+          const amount = base + jitter;
+          const orderCost = Math.round(amount * (0.55 + Math.random() * 0.15) * 100) / 100;
           await prisma.revenueEntry.create({
             data: {
               shopId: shop.id,
               date: toDateStr(year, month, day),
-              amount: base + jitter,
+              amount,
+              orderCost,
             },
           });
         }

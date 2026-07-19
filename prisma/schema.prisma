@@ -44,6 +44,7 @@ model RevenueEntry {
   id        String   @id @default(cuid())
   date      String // "YYYY-MM-DD"
   amount    Float
+  orderCost Float    @default(0) // 아마존 발주가격
   createdAt DateTime @default(now())
   shopId    String
   shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)

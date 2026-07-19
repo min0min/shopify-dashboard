@@ -34,12 +34,12 @@ export default function AddShopForm({ googleAccountId }: { googleAccountId: stri
         value={name}
         onChange={(e) => setName(e.target.value)}
         placeholder="새 샵 이름 (예: 샵 1)"
-        className="flex-1 rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm"
+        className="flex-1 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500"
       />
       <button
         type="submit"
         disabled={pending}
-        className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+        className="rounded-lg bg-neutral-900 dark:bg-white px-4 py-2 text-sm font-medium text-white dark:text-neutral-900 disabled:opacity-50"
       >
         {pending ? "추가중..." : "샵 추가"}
       </button>
