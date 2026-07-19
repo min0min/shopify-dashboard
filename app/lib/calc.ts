@@ -5,6 +5,9 @@ export type ShopLike = {
   revenueEntries: RevenueEntryLike[];
 };
 
+/** 매출에 부과되는 세율 */
+export const TAX_RATE = 0.12;
+
 export function currentMonth(): string {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
@@ -43,11 +46,16 @@ export function shopRevenueForDate(shop: ShopLike, date: string): number {
     .reduce((sum, entry) => sum + entry.amount, 0);
 }
 
+export function shopTaxForMonth(shop: ShopLike, month: string): number {
+  return shopRevenueForMonth(shop, month) * TAX_RATE;
+}
+
 export function shopNetProfitForMonth(shop: ShopLike, month: string): number {
   return (
     shopRevenueForMonth(shop, month) -
     shopFixedCostTotal(shop) -
-    shopOrderCostForMonth(shop, month)
+    shopOrderCostForMonth(shop, month) -
+    shopTaxForMonth(shop, month)
   );
 }
 
@@ -76,9 +84,10 @@ export function sumTotals(shops: ShopLike[], month: string) {
       acc.revenue += shopRevenueForMonth(shop, month);
       acc.fixedCost += shopFixedCostTotal(shop);
       acc.orderCost += shopOrderCostForMonth(shop, month);
+      acc.tax += shopTaxForMonth(shop, month);
       return acc;
     },
-    { revenue: 0, fixedCost: 0, orderCost: 0 }
+    { revenue: 0, fixedCost: 0, orderCost: 0, tax: 0 }
   );
 }
 

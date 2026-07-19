@@ -1,19 +1,21 @@
-import { formatCurrency, formatKRW } from "@/app/lib/calc";
+import { TAX_RATE, formatCurrency, formatKRW } from "@/app/lib/calc";
 
 export default function SummaryCards({
   revenue,
   fixedCost,
   orderCost,
+  tax,
   month,
   krwRate,
 }: {
   revenue: number;
   fixedCost: number;
   orderCost: number;
+  tax: number;
   month: string;
   krwRate: number;
 }) {
-  const netProfit = revenue - fixedCost - orderCost;
+  const netProfit = revenue - fixedCost - orderCost - tax;
   const cards = [
     {
       label: "총 매출",
@@ -31,6 +33,11 @@ export default function SummaryCards({
       tone: "text-amber-600 dark:text-amber-400",
     },
     {
+      label: `세금 (${Math.round(TAX_RATE * 100)}%)`,
+      value: tax,
+      tone: "text-orange-600 dark:text-orange-400",
+    },
+    {
       label: "순이익",
       value: netProfit,
       tone:
@@ -43,7 +50,7 @@ export default function SummaryCards({
   return (
     <div>
       <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-2">{month} 기준</p>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         {cards.map((c) => (
           <div
             key={c.label}

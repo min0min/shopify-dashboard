@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { formatCurrency } from "@/app/lib/calc";
+import { TAX_RATE, formatCurrency } from "@/app/lib/calc";
 import DeleteButton from "@/app/components/DeleteButton";
 import InlineEditableName from "@/app/components/InlineEditableName";
 
@@ -16,7 +16,8 @@ export default function ShopCard({
   fixedCost: number;
   orderCost: number;
 }) {
-  const netProfit = revenue - fixedCost - orderCost;
+  const tax = revenue * TAX_RATE;
+  const netProfit = revenue - fixedCost - orderCost - tax;
   return (
     <Link
       href={`/shops/${id}`}
@@ -39,7 +40,7 @@ export default function ShopCard({
           confirmMessage={`"${name}" 샵과 관련 데이터를 삭제할까요?`}
         />
       </div>
-      <div className="mt-4 grid grid-cols-2 gap-x-2 gap-y-3 text-sm">
+      <div className="mt-4 grid grid-cols-3 gap-x-2 gap-y-3 text-sm">
         <div>
           <p className="text-neutral-400 dark:text-neutral-500">매출</p>
           <p className="font-medium text-neutral-900 dark:text-neutral-100">
@@ -59,6 +60,12 @@ export default function ShopCard({
           </p>
         </div>
         <div>
+          <p className="text-neutral-400 dark:text-neutral-500">세금</p>
+          <p className="font-medium text-orange-600 dark:text-orange-400">
+            {formatCurrency(tax)}
+          </p>
+        </div>
+        <div className="col-span-2">
           <p className="text-neutral-400 dark:text-neutral-500">순이익</p>
           <p
             className={`font-medium ${

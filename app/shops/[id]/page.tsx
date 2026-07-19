@@ -9,6 +9,7 @@ import {
   shopFixedCostTotal,
   shopOrderCostForMonth,
   shopRevenueForMonth,
+  shopTaxForMonth,
 } from "@/app/lib/calc";
 import SummaryCards from "@/app/components/SummaryCards";
 import FixedCostManager from "@/app/components/FixedCostManager";
@@ -45,6 +46,7 @@ export default async function ShopPage({
   const revenue = shopRevenueForMonth(shop, month);
   const fixedCost = shopFixedCostTotal(shop);
   const orderCost = shopOrderCostForMonth(shop, month);
+  const tax = shopTaxForMonth(shop, month);
   const chartSeries = monthlyRevenueSeries([shop], lastNMonths(6, month));
 
   return (
@@ -77,6 +79,7 @@ export default async function ShopPage({
           revenue={revenue}
           fixedCost={fixedCost}
           orderCost={orderCost}
+          tax={tax}
           month={month}
           krwRate={krwRate}
         />

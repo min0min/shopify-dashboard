@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { currentDate, formatCurrency } from "@/app/lib/calc";
+import { TAX_RATE, currentDate, formatCurrency } from "@/app/lib/calc";
 import DeleteButton from "@/app/components/DeleteButton";
 
 type RevenueEntry = { id: string; date: string; amount: number; orderCost: number };
@@ -64,13 +64,15 @@ export default function RevenueManager({
                 <th className="pb-2 font-medium">날짜</th>
                 <th className="pb-2 font-medium">매출</th>
                 <th className="pb-2 font-medium">발주가격</th>
+                <th className="pb-2 font-medium">세금</th>
                 <th className="pb-2 font-medium">순이익</th>
                 <th className="pb-2"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
               {sorted.map((entry) => {
-                const net = entry.amount - entry.orderCost;
+                const tax = entry.amount * TAX_RATE;
+                const net = entry.amount - entry.orderCost - tax;
                 return (
                   <tr key={entry.id}>
                     <td className="py-2 text-neutral-700 dark:text-neutral-300">{entry.date}</td>
@@ -79,6 +81,9 @@ export default function RevenueManager({
                     </td>
                     <td className="py-2 font-medium text-amber-600 dark:text-amber-400">
                       {formatCurrency(entry.orderCost)}
+                    </td>
+                    <td className="py-2 font-medium text-orange-600 dark:text-orange-400">
+                      {formatCurrency(tax)}
                     </td>
                     <td
                       className={`py-2 font-medium ${

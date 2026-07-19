@@ -48,6 +48,7 @@ export default async function HomePage({
           revenue={totals.revenue}
           fixedCost={totals.fixedCost}
           orderCost={totals.orderCost}
+          tax={totals.tax}
           month={month}
           krwRate={krwRate}
         />

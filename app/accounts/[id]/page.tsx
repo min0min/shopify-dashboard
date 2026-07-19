@@ -65,6 +65,7 @@ export default async function AccountPage({
           revenue={totals.revenue}
           fixedCost={totals.fixedCost}
           orderCost={totals.orderCost}
+          tax={totals.tax}
           month={month}
           krwRate={krwRate}
         />
