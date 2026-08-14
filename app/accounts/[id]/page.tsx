@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/app/lib/prisma";
 import { getUsdToKrwRate } from "@/app/lib/exchangeRate";
-import { collectAvailableMonths, lastNMonths, monthlyRevenueSeries, sumTotals } from "@/app/lib/calc";
+import { chartSeriesForRange, formatRangeLabel, parseRangeParams, sumTotalsForRange } from "@/app/lib/calc";
 import SummaryCards from "@/app/components/SummaryCards";
 import ShopCard from "@/app/components/ShopCard";
 import AddShopForm from "@/app/components/AddShopForm";
@@ -14,10 +14,10 @@ export default async function AccountPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ month?: string }>;
+  searchParams: Promise<{ from?: string; to?: string }>;
 }) {
   const { id } = await params;
-  const { month: monthParam } = await searchParams;
+  const { from, to } = await searchParams;
 
   const [account, krwRate] = await Promise.all([
     prisma.googleAccount.findUnique({
@@ -34,10 +34,9 @@ export default async function AccountPage({
 
   if (!account) notFound();
 
-  const months = collectAvailableMonths(account.shops);
-  const month = monthParam && months.includes(monthParam) ? monthParam : months[0];
-  const totals = sumTotals(account.shops, month);
-  const chartSeries = monthlyRevenueSeries(account.shops, lastNMonths(6, month));
+  const range = parseRangeParams(from, to);
+  const totals = sumTotalsForRange(account.shops, range.from, range.to);
+  const chartSeries = chartSeriesForRange(account.shops, range.from, range.to).points;
 
   return (
     <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-10">
@@ -66,7 +65,7 @@ export default async function AccountPage({
           fixedCost={totals.fixedCost}
           orderCost={totals.orderCost}
           tax={totals.tax}
-          month={month}
+          rangeLabel={formatRangeLabel(range)}
           krwRate={krwRate}
         />
       </div>
@@ -91,7 +90,7 @@ export default async function AccountPage({
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {account.shops.map((shop) => {
-              const shopTotals = sumTotals([shop], month);
+              const shopTotals = sumTotalsForRange([shop], range.from, range.to);
               return (
                 <ShopCard
                   key={shop.id}

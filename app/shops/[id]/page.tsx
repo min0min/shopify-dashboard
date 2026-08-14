@@ -3,13 +3,13 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/app/lib/prisma";
 import { getUsdToKrwRate } from "@/app/lib/exchangeRate";
 import {
-  collectAvailableMonths,
-  lastNMonths,
-  monthlyRevenueSeries,
-  shopFixedCostTotal,
-  shopOrderCostForMonth,
-  shopRevenueForMonth,
-  shopTaxForMonth,
+  chartSeriesForRange,
+  formatRangeLabel,
+  parseRangeParams,
+  shopFixedCostForRange,
+  shopOrderCostForRange,
+  shopRevenueForRange,
+  shopTaxForRange,
 } from "@/app/lib/calc";
 import SummaryCards from "@/app/components/SummaryCards";
 import FixedCostManager from "@/app/components/FixedCostManager";
@@ -22,10 +22,10 @@ export default async function ShopPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ month?: string }>;
+  searchParams: Promise<{ from?: string; to?: string }>;
 }) {
   const { id } = await params;
-  const { month: monthParam } = await searchParams;
+  const { from, to } = await searchParams;
 
   const [shop, krwRate] = await Promise.all([
     prisma.shop.findUnique({
@@ -41,13 +41,12 @@ export default async function ShopPage({
 
   if (!shop) notFound();
 
-  const months = collectAvailableMonths([shop]);
-  const month = monthParam && months.includes(monthParam) ? monthParam : months[0];
-  const revenue = shopRevenueForMonth(shop, month);
-  const fixedCost = shopFixedCostTotal(shop);
-  const orderCost = shopOrderCostForMonth(shop, month);
-  const tax = shopTaxForMonth(shop, month);
-  const chartSeries = monthlyRevenueSeries([shop], lastNMonths(6, month));
+  const range = parseRangeParams(from, to);
+  const revenue = shopRevenueForRange(shop, range.from, range.to);
+  const fixedCost = shopFixedCostForRange(shop, range.from, range.to);
+  const orderCost = shopOrderCostForRange(shop, range.from, range.to);
+  const tax = shopTaxForRange(shop, range.from, range.to);
+  const chartSeries = chartSeriesForRange([shop], range.from, range.to).points;
 
   return (
     <main className="mx-auto w-full max-w-4xl flex-1 px-6 py-10">
@@ -80,7 +79,7 @@ export default async function ShopPage({
           fixedCost={fixedCost}
           orderCost={orderCost}
           tax={tax}
-          month={month}
+          rangeLabel={formatRangeLabel(range)}
           krwRate={krwRate}
         />
       </div>

@@ -12,6 +12,8 @@ export async function POST(
   const date = body.date as string | undefined;
   const amount = Number(body.amount);
   const orderCost = body.orderCost === undefined ? 0 : Number(body.orderCost);
+  const memo =
+    typeof body.memo === "string" && body.memo.trim() ? body.memo.trim() : null;
   if (!date || !DATE_RE.test(date) || Number.isNaN(amount) || Number.isNaN(orderCost)) {
     return NextResponse.json(
       { error: "date (YYYY-MM-DD), amount and orderCost are required" },
@@ -20,8 +22,8 @@ export async function POST(
   }
   const entry = await prisma.revenueEntry.upsert({
     where: { shopId_date: { shopId, date } },
-    update: { amount, orderCost },
-    create: { shopId, date, amount, orderCost },
+    update: { amount, orderCost, memo },
+    create: { shopId, date, amount, orderCost, memo },
   });
   return NextResponse.json(entry, { status: 201 });
 }

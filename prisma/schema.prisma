@@ -45,6 +45,7 @@ model RevenueEntry {
   date      String // "YYYY-MM-DD"
   amount    Float
   orderCost Float    @default(0) // 아마존 발주가격
+  memo      String?
   createdAt DateTime @default(now())
   shopId    String
   shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)

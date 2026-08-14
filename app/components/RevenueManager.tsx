@@ -4,8 +4,15 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { TAX_RATE, currentDate, formatCurrency } from "@/app/lib/calc";
 import DeleteButton from "@/app/components/DeleteButton";
+import MemoField from "@/app/components/MemoField";
 
-type RevenueEntry = { id: string; date: string; amount: number; orderCost: number };
+type RevenueEntry = {
+  id: string;
+  date: string;
+  amount: number;
+  orderCost: number;
+  memo: string | null;
+};
 
 export default function RevenueManager({
   shopId,
@@ -18,6 +25,7 @@ export default function RevenueManager({
   const [date, setDate] = useState(currentDate());
   const [amount, setAmount] = useState("");
   const [orderCost, setOrderCost] = useState("");
+  const [memo, setMemo] = useState("");
   const [pending, setPending] = useState(false);
 
   const sorted = [...entries].sort((a, b) => (a.date < b.date ? 1 : -1));
@@ -32,11 +40,12 @@ export default function RevenueManager({
       const res = await fetch(`/api/shops/${shopId}/revenue`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ date, amount: amountNum, orderCost: orderCostNum }),
+        body: JSON.stringify({ date, amount: amountNum, orderCost: orderCostNum, memo }),
       });
       if (!res.ok) throw new Error("저장 실패");
       setAmount("");
       setOrderCost("");
+      setMemo("");
       router.refresh();
     } catch {
       alert("매출 입력 중 오류가 발생했습니다.");
@@ -66,6 +75,7 @@ export default function RevenueManager({
                 <th className="pb-2 font-medium">발주가격</th>
                 <th className="pb-2 font-medium">세금</th>
                 <th className="pb-2 font-medium">순이익</th>
+                <th className="pb-2 font-medium">메모</th>
                 <th className="pb-2"></th>
               </tr>
             </thead>
@@ -93,6 +103,9 @@ export default function RevenueManager({
                       }`}
                     >
                       {formatCurrency(net)}
+                    </td>
+                    <td className="py-2">
+                      <MemoField url={`/api/revenue/${entry.id}`} memo={entry.memo} />
                     </td>
                     <td className="py-2 text-right">
                       <DeleteButton
@@ -127,6 +140,12 @@ export default function RevenueManager({
           onChange={(e) => setOrderCost(e.target.value)}
           placeholder="발주가격(아마존)"
           inputMode="decimal"
+          className="flex-1 min-w-32 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500"
+        />
+        <input
+          value={memo}
+          onChange={(e) => setMemo(e.target.value)}
+          placeholder="메모 (선택)"
           className="flex-1 min-w-32 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 dark:placeholder:text-neutral-500"
         />
         <button

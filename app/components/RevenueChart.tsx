@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { formatCurrency } from "@/app/lib/calc";
 
-type Point = { month: string; revenue: number };
+type Point = { key: string; label: string; revenue: number };
 
 const WIDTH = 640;
 const HEIGHT = 220;
@@ -22,11 +22,6 @@ function niceMax(value: number): number {
   else if (normalized <= 5) niceNormalized = 5;
   else niceNormalized = 10;
   return niceNormalized * magnitude;
-}
-
-function monthLabel(month: string): string {
-  const [, m] = month.split("-");
-  return `${Number(m)}월`;
 }
 
 export default function RevenueChart({
@@ -133,14 +128,14 @@ export default function RevenueChart({
 
           {points.map((p, i) => (
             <text
-              key={`label-${p.month}`}
+              key={`label-${p.key}`}
               x={p.x}
               y={HEIGHT - 8}
               textAnchor="middle"
               fontSize={11}
               style={{ fill: "var(--chart-muted)" }}
             >
-              {i === 0 || i === points.length - 1 || points.length <= 8 ? monthLabel(p.month) : ""}
+              {i === 0 || i === points.length - 1 || points.length <= 8 ? p.label : ""}
             </text>
           ))}
 
@@ -178,7 +173,7 @@ export default function RevenueChart({
 
       {hoverIndex !== null && points[hoverIndex] && (
         <p className="mt-1 text-center text-sm text-neutral-600 dark:text-neutral-400">
-          {points[hoverIndex].month} ·{" "}
+          {points[hoverIndex].label} ·{" "}
           <span className="font-medium text-neutral-900 dark:text-neutral-100">
             {formatCurrency(points[hoverIndex].revenue)}
           </span>

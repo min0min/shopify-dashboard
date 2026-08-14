@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { Suspense, useMemo, useState } from "react";
-import HeaderCalendar from "@/app/components/HeaderCalendar";
+import DateRangePicker from "@/app/components/DateRangePicker";
 
 type Shop = { id: string; name: string };
 type Account = { id: string; name: string; shops: Shop[] };
@@ -138,7 +138,7 @@ export default function TopNav({
         </div>
 
         <Suspense fallback={null}>
-          <HeaderCalendar revenueByDate={revenueByDate} />
+          <DateRangePicker revenueByDate={revenueByDate} />
         </Suspense>
 
         <div className="ml-auto">

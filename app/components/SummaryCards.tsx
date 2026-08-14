@@ -5,14 +5,14 @@ export default function SummaryCards({
   fixedCost,
   orderCost,
   tax,
-  month,
+  rangeLabel,
   krwRate,
 }: {
   revenue: number;
   fixedCost: number;
   orderCost: number;
   tax: number;
-  month: string;
+  rangeLabel: string;
   krwRate: number;
 }) {
   const netProfit = revenue - fixedCost - orderCost - tax;
@@ -49,7 +49,7 @@ export default function SummaryCards({
 
   return (
     <div>
-      <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-2">{month} 기준</p>
+      <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-2">{rangeLabel} 기준</p>
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         {cards.map((c) => (
           <div
