@@ -6,6 +6,8 @@ import { settlementBalance } from "@/app/lib/settlement";
 import SettlementCalendar from "@/app/components/SettlementCalendar";
 import SettlementBox from "@/app/components/SettlementBox";
 
+export const dynamic = "force-dynamic";
+
 export default async function SettlementPage() {
   const [entries, krwRate] = await Promise.all([
     prisma.settlementEntry.findMany({ orderBy: { date: "desc" } }),
@@ -17,7 +19,7 @@ export default async function SettlementPage() {
   const withdrawals = entries.filter((e) => e.type === "WITHDRAWAL");
 
   return (
-    <main className="mx-auto w-full max-w-4xl flex-1 px-6 py-10">
+    <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-10">
       <Link
         href="/"
         className="text-sm text-neutral-500 dark:text-neutral-400 hover:text-neutral-800 dark:hover:text-neutral-200"
@@ -46,7 +48,7 @@ export default async function SettlementPage() {
         <SettlementCalendar entries={entries} />
       </div>
 
-      <div className="mt-8 grid grid-cols-1 gap-6">
+      <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
         <SettlementBox type="DEPOSIT" title="입금" entries={deposits} />
         <SettlementBox type="WITHDRAWAL" title="출금" entries={withdrawals} />
       </div>
