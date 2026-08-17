@@ -52,3 +52,12 @@ model RevenueEntry {
 
   @@unique([shopId, date])
 }
+
+model SettlementEntry {
+  id        String   @id @default(cuid())
+  type      String // "DEPOSIT" | "WITHDRAWAL"
+  date      String // "YYYY-MM-DD"
+  amount    Float
+  memo      String?
+  createdAt DateTime @default(now())
+}

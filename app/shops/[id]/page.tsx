@@ -11,6 +11,7 @@ import {
   shopRevenueForRange,
   shopTaxForRange,
 } from "@/app/lib/calc";
+import { settlementBalance } from "@/app/lib/settlement";
 import SummaryCards from "@/app/components/SummaryCards";
 import FixedCostManager from "@/app/components/FixedCostManager";
 import RevenueManager from "@/app/components/RevenueManager";
@@ -27,7 +28,7 @@ export default async function ShopPage({
   const { id } = await params;
   const { from, to } = await searchParams;
 
-  const [shop, krwRate] = await Promise.all([
+  const [shop, krwRate, settlementEntries] = await Promise.all([
     prisma.shop.findUnique({
       where: { id },
       include: {
@@ -37,6 +38,7 @@ export default async function ShopPage({
       },
     }),
     getUsdToKrwRate(),
+    prisma.settlementEntry.findMany(),
   ]);
 
   if (!shop) notFound();
@@ -47,6 +49,7 @@ export default async function ShopPage({
   const orderCost = shopOrderCostForRange(shop, range.from, range.to);
   const tax = shopTaxForRange(shop, range.from, range.to);
   const chartSeries = chartSeriesForRange([shop], range.from, range.to).points;
+  const settlement = settlementBalance(settlementEntries);
 
   return (
     <main className="mx-auto w-full max-w-4xl flex-1 px-6 py-10">
@@ -79,6 +82,7 @@ export default async function ShopPage({
           fixedCost={fixedCost}
           orderCost={orderCost}
           tax={tax}
+          settlementBalance={settlement}
           rangeLabel={formatRangeLabel(range)}
           krwRate={krwRate}
         />

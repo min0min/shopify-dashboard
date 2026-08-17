@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { TAX_RATE, formatCurrency, formatKRW } from "@/app/lib/calc";
 
 export default function SummaryCards({
@@ -5,6 +6,7 @@ export default function SummaryCards({
   fixedCost,
   orderCost,
   tax,
+  settlementBalance,
   rangeLabel,
   krwRate,
 }: {
@@ -12,6 +14,7 @@ export default function SummaryCards({
   fixedCost: number;
   orderCost: number;
   tax: number;
+  settlementBalance: number;
   rangeLabel: string;
   krwRate: number;
 }) {
@@ -50,7 +53,7 @@ export default function SummaryCards({
   return (
     <div>
       <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-2">{rangeLabel} 기준</p>
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
         {cards.map((c) => (
           <div
             key={c.label}
@@ -65,6 +68,29 @@ export default function SummaryCards({
             </p>
           </div>
         ))}
+        <Link
+          href="/settlement"
+          className="group rounded-xl border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 p-4 shadow-sm transition hover:border-neutral-300 dark:hover:border-neutral-700 hover:shadow-md"
+        >
+          <p className="text-sm text-neutral-500 dark:text-neutral-400">
+            정산금{" "}
+            <span className="text-neutral-300 dark:text-neutral-600 group-hover:text-neutral-500 dark:group-hover:text-neutral-400">
+              →
+            </span>
+          </p>
+          <p
+            className={`mt-1 text-xl sm:text-2xl font-semibold ${
+              settlementBalance >= 0
+                ? "text-emerald-600 dark:text-emerald-400"
+                : "text-rose-600 dark:text-rose-400"
+            }`}
+          >
+            {formatCurrency(settlementBalance)}
+          </p>
+          <p className="mt-0.5 text-xs text-neutral-400 dark:text-neutral-500">
+            {formatKRW(settlementBalance, krwRate)}
+          </p>
+        </Link>
       </div>
     </div>
   );

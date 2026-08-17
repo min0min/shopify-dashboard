@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/app/lib/prisma";
 import { getUsdToKrwRate } from "@/app/lib/exchangeRate";
 import { chartSeriesForRange, formatRangeLabel, parseRangeParams, sumTotalsForRange } from "@/app/lib/calc";
+import { settlementBalance } from "@/app/lib/settlement";
 import SummaryCards from "@/app/components/SummaryCards";
 import ShopCard from "@/app/components/ShopCard";
 import AddShopForm from "@/app/components/AddShopForm";
@@ -19,7 +20,7 @@ export default async function AccountPage({
   const { id } = await params;
   const { from, to } = await searchParams;
 
-  const [account, krwRate] = await Promise.all([
+  const [account, krwRate, settlementEntries] = await Promise.all([
     prisma.googleAccount.findUnique({
       where: { id },
       include: {
@@ -30,6 +31,7 @@ export default async function AccountPage({
       },
     }),
     getUsdToKrwRate(),
+    prisma.settlementEntry.findMany(),
   ]);
 
   if (!account) notFound();
@@ -37,6 +39,7 @@ export default async function AccountPage({
   const range = parseRangeParams(from, to);
   const totals = sumTotalsForRange(account.shops, range.from, range.to);
   const chartSeries = chartSeriesForRange(account.shops, range.from, range.to).points;
+  const settlement = settlementBalance(settlementEntries);
 
   return (
     <main className="mx-auto w-full max-w-5xl flex-1 px-6 py-10">
@@ -65,6 +68,7 @@ export default async function AccountPage({
           fixedCost={totals.fixedCost}
           orderCost={totals.orderCost}
           tax={totals.tax}
+          settlementBalance={settlement}
           rangeLabel={formatRangeLabel(range)}
           krwRate={krwRate}
         />
