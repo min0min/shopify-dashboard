@@ -2,16 +2,19 @@ import Link from "next/link";
 import { TAX_RATE, formatCurrency } from "@/app/lib/calc";
 import DeleteButton from "@/app/components/DeleteButton";
 import InlineEditableName from "@/app/components/InlineEditableName";
+import InlineEditableDate from "@/app/components/InlineEditableDate";
 
 export default function ShopCard({
   id,
   name,
+  activeFromDate,
   revenue,
   fixedCost,
   orderCost,
 }: {
   id: string;
   name: string;
+  activeFromDate: string;
   revenue: number;
   fixedCost: number;
   orderCost: number;
@@ -34,6 +37,9 @@ export default function ShopCard({
             as="h3"
             className="mt-1 text-lg font-semibold text-neutral-900 dark:text-neutral-100"
           />
+          <div className="mt-1">
+            <InlineEditableDate url={`/api/shops/${id}`} value={activeFromDate} />
+          </div>
         </div>
         <DeleteButton
           url={`/api/shops/${id}`}

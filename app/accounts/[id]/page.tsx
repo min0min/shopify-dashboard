@@ -2,7 +2,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/app/lib/prisma";
 import { getUsdToKrwRate } from "@/app/lib/exchangeRate";
-import { chartSeriesForRange, formatRangeLabel, parseRangeParams, sumTotalsForRange } from "@/app/lib/calc";
+import {
+  chartSeriesForRange,
+  formatRangeLabel,
+  parseRangeParams,
+  shopActiveFromDate,
+  sumTotalsForRange,
+} from "@/app/lib/calc";
 import { settlementBalance } from "@/app/lib/settlement";
 import SummaryCards from "@/app/components/SummaryCards";
 import ShopCard from "@/app/components/ShopCard";
@@ -100,6 +106,7 @@ export default async function AccountPage({
                   key={shop.id}
                   id={shop.id}
                   name={shop.name}
+                  activeFromDate={shopActiveFromDate(shop)}
                   revenue={shopTotals.revenue}
                   fixedCost={shopTotals.fixedCost}
                   orderCost={shopTotals.orderCost}

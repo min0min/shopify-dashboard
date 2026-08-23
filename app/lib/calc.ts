@@ -1,6 +1,8 @@
 export type FixedCostItemLike = { amount: number };
 export type RevenueEntryLike = { date: string; amount: number; orderCost: number };
 export type ShopLike = {
+  createdAt: Date;
+  activeFrom: string | null;
   fixedCostItems: FixedCostItemLike[];
   revenueEntries: RevenueEntryLike[];
 };
@@ -63,12 +65,12 @@ function inRange(date: string, from: string, to: string): boolean {
   return date >= from && date <= to;
 }
 
-function parseDate(date: string): Date {
+export function parseDate(date: string): Date {
   const [y, m, d] = date.split("-").map(Number);
   return new Date(y, m - 1, d);
 }
 
-function formatDate(date: Date): string {
+export function formatDate(date: Date): string {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(
     date.getDate()
   ).padStart(2, "0")}`;
@@ -130,6 +132,10 @@ export function parseRangeParams(from?: string, to?: string): DateRange {
 function formatDot(date: string): string {
   const [y, m, d] = date.split("-").map(Number);
   return `${y}.${m}.${d}`;
+}
+
+export function formatCreatedDate(date: Date): string {
+  return formatDot(formatDate(date));
 }
 
 export function formatRangeLabel({ from, to }: DateRange): string {
@@ -195,11 +201,23 @@ export function shopTaxForRange(shop: ShopLike, from: string, to: string): numbe
   return shopRevenueForRange(shop, from, to) * TAX_RATE;
 }
 
-/** Prorates the flat monthly fixed cost across the days actually covered by the range. */
+/** The date fixed costs start applying from: the user-set override, or the shop's creation date. */
+export function shopActiveFromDate(shop: ShopLike): string {
+  return shop.activeFrom ?? formatDate(shop.createdAt);
+}
+
+/**
+ * Prorates the flat monthly fixed cost across the days actually covered by the range,
+ * clipped to start no earlier than the shop's active-from date (a shop can't owe fixed
+ * costs for days before it existed / went live).
+ */
 export function shopFixedCostForRange(shop: ShopLike, from: string, to: string): number {
   const monthlyTotal = shopFixedCostTotal(shop);
   if (monthlyTotal === 0) return 0;
-  return eachDateInRange(from, to).reduce((sum, date) => {
+  const activeFrom = shopActiveFromDate(shop);
+  const effectiveFrom = activeFrom > from ? activeFrom : from;
+  if (effectiveFrom > to) return 0;
+  return eachDateInRange(effectiveFrom, to).reduce((sum, date) => {
     const [y, m] = date.split("-").map(Number);
     return sum + monthlyTotal / daysInMonth(y, m);
   }, 0);

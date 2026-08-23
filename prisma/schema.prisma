@@ -25,6 +25,7 @@ model Shop {
   name            String
   order           Int             @default(0)
   createdAt       DateTime        @default(now())
+  activeFrom      String? // "YYYY-MM-DD", overrides createdAt for fixed-cost proration when set
   googleAccountId String
   googleAccount   GoogleAccount   @relation(fields: [googleAccountId], references: [id], onDelete: Cascade)
   fixedCostItems  FixedCostItem[]

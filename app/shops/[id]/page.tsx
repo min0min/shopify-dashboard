@@ -6,6 +6,7 @@ import {
   chartSeriesForRange,
   formatRangeLabel,
   parseRangeParams,
+  shopActiveFromDate,
   shopFixedCostForRange,
   shopOrderCostForRange,
   shopRevenueForRange,
@@ -17,6 +18,7 @@ import FixedCostManager from "@/app/components/FixedCostManager";
 import RevenueManager from "@/app/components/RevenueManager";
 import RevenueChart from "@/app/components/RevenueChart";
 import InlineEditableName from "@/app/components/InlineEditableName";
+import InlineEditableDate from "@/app/components/InlineEditableDate";
 
 export default async function ShopPage({
   params,
@@ -74,6 +76,9 @@ export default async function ShopPage({
           as="h1"
           className="text-2xl font-bold text-neutral-900 dark:text-neutral-100"
         />
+        <div className="mt-1">
+          <InlineEditableDate url={`/api/shops/${shop.id}`} value={shopActiveFromDate(shop)} />
+        </div>
       </div>
 
       <div className="mt-6">

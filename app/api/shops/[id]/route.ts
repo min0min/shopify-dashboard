@@ -20,17 +20,32 @@ export async function GET(
   return NextResponse.json(shop);
 }
 
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
   const body = await req.json();
-  const name = (body.name ?? "").trim();
-  if (!name) {
-    return NextResponse.json({ error: "name is required" }, { status: 400 });
+  const data: { name?: string; activeFrom?: string } = {};
+
+  if (typeof body.name === "string") {
+    const name = body.name.trim();
+    if (!name) {
+      return NextResponse.json({ error: "name is required" }, { status: 400 });
+    }
+    data.name = name;
   }
-  const shop = await prisma.shop.update({ where: { id }, data: { name } });
+
+  if (typeof body.activeFrom === "string") {
+    if (!DATE_RE.test(body.activeFrom)) {
+      return NextResponse.json({ error: "activeFrom must be YYYY-MM-DD" }, { status: 400 });
+    }
+    data.activeFrom = body.activeFrom;
+  }
+
+  const shop = await prisma.shop.update({ where: { id }, data });
   return NextResponse.json(shop);
 }
 
