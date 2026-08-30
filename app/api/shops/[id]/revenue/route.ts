@@ -20,10 +20,8 @@ export async function POST(
       { status: 400 }
     );
   }
-  const entry = await prisma.revenueEntry.upsert({
-    where: { shopId_date: { shopId, date } },
-    update: { amount, orderCost, memo },
-    create: { shopId, date, amount, orderCost, memo },
+  const entry = await prisma.revenueEntry.create({
+    data: { shopId, date, amount, orderCost, memo },
   });
   return NextResponse.json(entry, { status: 201 });
 }

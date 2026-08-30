@@ -51,7 +51,7 @@ model RevenueEntry {
   shopId    String
   shop      Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
 
-  @@unique([shopId, date])
+  @@index([shopId, date])
 }
 
 model SettlementEntry {
